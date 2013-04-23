@@ -1,4 +1,4 @@
 EmFifteen
 =========
 
-Minmal Http Server library for Java
+Minimal Http Server library for Java
