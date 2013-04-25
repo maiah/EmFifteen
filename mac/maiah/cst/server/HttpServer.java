@@ -10,28 +10,23 @@ import java.net.Socket;
 
 public class HttpServer {
 
-	private int port;
+	private ServerSocket serverSocket;
 
-	public HttpServer(int port) {
-		this.port = port;
+	@Override
+	protected void finalize() throws Throwable {
+		serverSocket.close();
+		serverSocket = null;
 	}
 
-	public void start() {
-		ServerSocket serverSocket = createServerSocket();
+	public HttpServer(int port) throws IOException {
+		serverSocket = new ServerSocket(port);
+	}
+
+	public void start() throws IOException {
 		listenToIncomingConnections(serverSocket);
 	}
 
-	private ServerSocket createServerSocket() {
-		ServerSocket serverSocket = null;
-		try {
-			serverSocket = new ServerSocket(port);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return serverSocket;
-	}
-
-	private void listenToIncomingConnections(ServerSocket serverSocket) {
+	private void listenToIncomingConnections(ServerSocket serverSocket) throws IOException {
 		while (true) {
 			Socket socket = null;
 			BufferedWriter bw = null;
@@ -44,9 +39,11 @@ public class HttpServer {
 				bw.flush();
 
 			} catch (IOException e) {
-				e.printStackTrace();
+				throw e;
 			} finally {
 				closeSocketAndWriter(socket, bw);
+				socket = null;
+				bw = null;
 			}			
 		}
 	}
